@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claria — Code Snippets</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .screen-shell { flex-direction: column; min-height: 100vh; }
+
+    .top-bar {
+      width: 100%; max-width: 400px;
+      display: flex; justify-content: flex-end;
+      padding: 8px 0; position: relative; z-index: 1;
+    }
+    .btn-skip { font-size: 13px; color: var(--text-muted); padding: 6px 12px; border-radius: 20px; transition: color 0.2s; }
+    .btn-skip:hover { color: var(--text-secondary); }
+
+    .illus-wrap {
+      width: 100%; max-width: 400px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 0 8px; position: relative; z-index: 1;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .code-card {
+      width: 290px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .code-topbar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot-r { width: 8px; height: 8px; border-radius: 50%; background: #ff5f57; }
+    .dot-y { width: 8px; height: 8px; border-radius: 50%; background: #febc2e; }
+    .dot-g { width: 8px; height: 8px; border-radius: 50%; background: #28c840; }
+    .file-tab {
+      margin-left: 8px; padding: 3px 10px; border-radius: 6px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      font-size: 11px; color: var(--text-secondary); font-family: monospace;
+    }
+
+    .code-body { padding: 16px; font-family: monospace; font-size: 12px; line-height: 1.7; }
+    .ln { color: var(--text-muted); margin-right: 14px; user-select: none; }
+    .kw  { color: #c084fc; }
+    .fn  { color: #818cf8; }
+    .str { color: #34d399; }
+    .cm  { color: #4a4660; font-style: italic; }
+    .punc { color: var(--text-muted); }
+
+    .copy-btn {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 6px; padding: 8px 16px 14px;
+      font-size: 11px; color: var(--purple-light); cursor: pointer;
+    }
+
+    .copy-wrap-text {
+      width: 100%; max-width: 400px;
+      padding: 8px 0; position: relative; z-index: 1;
+    }
+    .copy-wrap-text h1 {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 700;
+      color: var(--text-primary); line-height: 1.25;
+      animation: fadeUp 0.5s ease 0.1s both;
+    }
+    .copy-wrap-text h1 span { color: var(--purple-light); }
+    .copy-wrap-text p {
+      font-size: 15px; color: var(--text-secondary);
+      line-height: 1.65; margin-top: 12px;
+      animation: fadeUp 0.5s ease 0.2s both;
+    }
+
+    .bottom-wrap {
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 16px;
+      padding: 16px 0 8px; position: relative; z-index: 1;
+      animation: fadeUp 0.5s ease 0.3s both;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="screen-shell">
+    <div class="top-bar">
+      <button class="btn-skip" onclick="window.location.href='signup.html'">Skip</button>
+    </div>
+
+    <div class="illus-wrap">
+      <div class="code-card">
+        <div class="code-topbar">
+          <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+          <div class="file-tab">useDebounce.js</div>
+        </div>
+        <div class="code-body">
+          <div><span class="ln">1</span><span class="cm">// Reusable debounce hook</span></div>
+          <div><span class="ln">2</span><span class="kw">import</span> <span class="punc">{ </span><span class="fn">useState</span><span class="punc">, </span><span class="fn">useEffect</span><span class="punc"> }</span></div>
+          <div><span class="ln">3</span><span class="kw"> from </span><span class="str">'react'</span><span class="punc">;</span></div>
+          <div><span class="ln">4</span></div>
+          <div><span class="ln">5</span><span class="kw">export function </span><span class="fn">useDebounce</span><span class="punc">(</span><span class="fn">value</span><span class="punc">, </span><span class="fn">delay</span><span class="punc">) {</span></div>
+          <div><span class="ln">6</span>&nbsp;&nbsp;<span class="kw">const </span><span class="punc">[</span><span class="fn">debounced</span><span class="punc">, </span><span class="fn">set</span><span class="punc">] = </span><span class="fn">useState</span><span class="punc">(</span><span class="fn">value</span><span class="punc">);</span></div>
+          <div><span class="ln">7</span>&nbsp;&nbsp;<span class="fn">useEffect</span><span class="punc">(() => {</span></div>
+          <div><span class="ln">8</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const </span><span class="fn">t</span><span class="punc"> = </span><span class="fn">setTimeout</span><span class="punc">(() => </span><span class="fn">set</span><span class="punc">(</span><span class="fn">value</span><span class="punc">), </span><span class="fn">delay</span><span class="punc">);</span></div>
+          <div><span class="ln">9</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return </span><span class="punc">() => </span><span class="fn">clearTimeout</span><span class="punc">(</span><span class="fn">t</span><span class="punc">);</span></div>
+          <div><span class="ln">10</span>&nbsp;&nbsp;<span class="punc">}, [</span><span class="fn">value</span><span class="punc">, </span><span class="fn">delay</span><span class="punc">]);</span></div>
+        </div>
+        <div class="copy-btn">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><rect x="5" y="5" width="9" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 11V3a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+          Copy snippet
+        </div>
+      </div>
+    </div>
+
+    <div class="copy-wrap-text card">
+      <h1>Save & reuse your<br/><span>best snippets</span></h1>
+      <p>Store hooks, components, and utility functions you write once and use forever — searchable and always ready.</p>
+    </div>
+
+    <div class="bottom-wrap card">
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="btn-primary" onclick="window.location.href='onboarding-4.html'">Next</button>
+    </div>
+  </div>
+
+</body>
+</html>

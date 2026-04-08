@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claria — Smart Tasks</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .screen-shell { flex-direction: column; min-height: 100vh; }
+
+    .top-bar {
+      width: 100%; max-width: 400px;
+      display: flex; justify-content: flex-end;
+      padding: 8px 0; position: relative; z-index: 1;
+    }
+    .btn-skip { font-size: 13px; color: var(--text-muted); padding: 6px 12px; border-radius: 20px; transition: color 0.2s; }
+    .btn-skip:hover { color: var(--text-secondary); }
+
+    .illus-wrap {
+      width: 100%; max-width: 400px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px 0 8px;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .task-card {
+      width: 280px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .task-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .task-title { font-size: 13px; font-weight: 600; color: var(--text-primary); font-family: var(--font-display); }
+    .sprint-badge {
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(124,92,252,0.15); color: var(--purple-light);
+      font-size: 11px; font-weight: 500;
+    }
+
+    .task-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      margin-bottom: 8px;
+    }
+    .task-item.done { background: rgba(124,92,252,0.1); }
+    .task-item.idle { background: var(--bg-surface); border: 1px solid var(--border); }
+
+    .check {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .check.done { background: var(--purple-primary); }
+    .check.done::after { content: ''; width: 7px; height: 5px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translateY(-1px); display: block; }
+    .check.idle { border: 1.5px solid var(--border); }
+
+    .task-text { font-size: 12px; }
+    .task-text.done { color: var(--text-muted); text-decoration: line-through; }
+    .task-text.idle { color: var(--text-secondary); }
+
+    .progress-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+    .progress-text { font-size: 11px; color: var(--text-muted); }
+    .progress-fill {
+      flex: 1; height: 4px;
+      background: var(--bg-surface);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-fill-bar { height: 100%; width: 66%; background: var(--purple-primary); border-radius: 2px; }
+
+    .copy-wrap {
+      width: 100%; max-width: 400px;
+      padding: 8px 0; position: relative; z-index: 1;
+    }
+    .copy-wrap h1 {
+      font-family: var(--font-display);
+      font-size: 28px; font-weight: 700;
+      color: var(--text-primary); line-height: 1.25;
+      animation: fadeUp 0.5s ease 0.1s both;
+    }
+    .copy-wrap h1 span { color: var(--purple-light); }
+    .copy-wrap p {
+      font-size: 15px; color: var(--text-secondary);
+      line-height: 1.65; margin-top: 12px;
+      animation: fadeUp 0.5s ease 0.2s both;
+    }
+
+    .bottom-wrap {
+      width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 16px;
+      padding: 16px 0 8px; position: relative; z-index: 1;
+      animation: fadeUp 0.5s ease 0.3s both;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="screen-shell">
+    <div class="top-bar">
+      <button class="btn-skip" onclick="window.location.href='signup.html'">Skip</button>
+    </div>
+
+    <div class="illus-wrap">
+      <div class="task-card">
+        <div class="task-header">
+          <p class="task-title">Sprint Tasks</p>
+          <span class="sprint-badge">Week 3</span>
+        </div>
+
+        <div class="task-item done">
+          <div class="check done"></div>
+          <span class="task-text done">Fix navbar z-index bug</span>
+        </div>
+        <div class="task-item done">
+          <div class="check done"></div>
+          <span class="task-text done">Write modal component</span>
+        </div>
+        <div class="task-item idle">
+          <div class="check idle"></div>
+          <span class="task-text idle">Refactor API hooks</span>
+        </div>
+        <div class="task-item idle">
+          <div class="check idle"></div>
+          <span class="task-text idle">Add dark mode toggle</span>
+        </div>
+
+        <div class="progress-row">
+          <span class="progress-text">2 / 3 done</span>
+          <div class="progress-fill"><div class="progress-fill-bar"></div></div>
+          <span class="progress-text">66%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="copy-wrap card">
+      <h1>Ship faster with<br/><span>smart task tracking</span></h1>
+      <p>Break down features, squash bugs, and stay on top of sprints — without losing your flow state mid-session.</p>
+    </div>
+
+    <div class="bottom-wrap card">
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <button class="btn-primary" onclick="window.location.href='onboarding-3.html'">Next</button>
+    </div>
+  </div>
+
+</body>
+</html>

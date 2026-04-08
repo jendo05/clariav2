@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claria</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
+
+    .orb-1 { width: 400px; height: 400px; background: rgba(124,92,252,0.14); top: -140px; right: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: rgba(167,139,250,0.08); bottom: -100px; left: -80px; }
+
+    .splash-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
+      position: relative; z-index: 1;
+    }
+
+    .logo-ring {
+      width: 88px; height: 88px;
+      border-radius: 26px;
+      background: var(--bg-card);
+      border: 1px solid var(--purple-dim);
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .logo-ring svg { width: 44px; height: 44px; }
+
+    .app-name {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -1px;
+      animation: fadeUp 0.6s ease 0.15s both;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      letter-spacing: 0.3px;
+      animation: fadeUp 0.6s ease 0.25s both;
+    }
+
+    .progress-track {
+      width: 64px; height: 3px;
+      background: var(--bg-card);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+      animation: fadeUp 0.6s ease 0.35s both;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--purple-primary);
+      border-radius: 2px;
+      transition: width 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="splash-wrap">
+    <div class="logo-ring">
+      <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="16" stroke="#7c5cfc" stroke-width="1.5"/>
+        <path d="M14 22 L19 27 L30 16" stroke="#a78bfa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="22" cy="22" r="4" fill="#7c5cfc" opacity="0.25"/>
+      </svg>
+    </div>
+    <p class="app-name">Claria</p>
+    <p class="tagline">Built for frontend developers</p>
+    <div class="progress-track">
+      <div class="progress-bar" id="bar"></div>
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('bar').style.width = '100%';
+      }, 200);
+      setTimeout(() => {
+        window.location.href = 'onboarding-1.html';
+      }, 5000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claria — Create Account</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .screen-shell { align-items: flex-start; justify-content: center; padding-top: 40px; }
+
+    .logo-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 28px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .logo-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--purple-dim);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-primary); }
+
+    .page-heading {
+      font-family: var(--font-display);
+      font-size: 26px; font-weight: 700;
+      color: var(--text-primary); line-height: 1.2;
+      animation: fadeUp 0.4s ease 0.05s both;
+    }
+    .page-sub {
+      font-size: 14px; color: var(--text-secondary);
+      margin-top: 6px; margin-bottom: 28px;
+      animation: fadeUp 0.4s ease 0.1s both;
+    }
+
+    .form-stack { display: flex; flex-direction: column; gap: 16px; }
+
+    .name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .error-msg {
+      font-size: 12px; color: #f87171;
+      display: none; margin-top: 4px;
+    }
+    .form-group.has-error .form-input { border-color: #f87171; }
+    .form-group.has-error .error-msg { display: block; }
+
+    .password-strength { margin-top: 6px; }
+    .strength-bar { height: 3px; border-radius: 2px; background: var(--border); overflow: hidden; }
+    .strength-fill { height: 100%; width: 0%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+    .strength-text { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    .terms-row {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: var(--text-secondary);
+    }
+    .terms-row input[type="checkbox"] { margin-top: 2px; accent-color: var(--purple-primary); flex-shrink: 0; }
+
+    .signin-row { text-align: center; font-size: 14px; color: var(--text-muted); margin-top: 20px; }
+
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 12px 20px; border-radius: var(--radius-md);
+      font-size: 14px; color: var(--text-secondary);
+      opacity: 0; transition: all 0.3s; pointer-events: none;
+      white-space: nowrap; z-index: 100;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.error { border-color: #f87171; color: #f87171; }
+    .toast.success { border-color: var(--purple-dim); color: var(--purple-light); }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="screen-shell">
+    <div class="card">
+
+      <div class="logo-row">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="7" stroke="#7c5cfc" stroke-width="1.4"/>
+            <path d="M6.5 10 L8.5 12 L13.5 7" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="logo-name">Claria</span>
+      </div>
+
+      <h1 class="page-heading">Create your account</h1>
+      <p class="page-sub">Start building better habits today.</p>
+
+      <div class="form-stack fade-up delay-2">
+
+        <div class="name-row">
+          <div class="form-group" id="grp-first">
+            <label class="form-label" for="firstName">First name</label>
+            <input class="form-input" type="text" id="firstName" placeholder="Ada" autocomplete="given-name" />
+            <span class="error-msg">Required</span>
+          </div>
+          <div class="form-group" id="grp-last">
+            <label class="form-label" for="lastName">Last name</label>
+            <input class="form-input" type="text" id="lastName" placeholder="Lovelace" autocomplete="family-name" />
+            <span class="error-msg">Required</span>
+          </div>
+        </div>
+
+        <div class="form-group" id="grp-email">
+          <label class="form-label" for="email">Email address</label>
+          <input class="form-input" type="email" id="email" placeholder="ada@example.com" autocomplete="email" />
+          <span class="error-msg" id="email-err">Enter a valid email</span>
+        </div>
+
+        <div class="form-group" id="grp-password">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-wrap">
+            <input class="form-input" type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password" />
+            <span class="input-icon" id="togglePwd">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </span>
+          </div>
+          <div class="password-strength">
+            <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+            <p class="strength-text" id="strengthText"></p>
+          </div>
+          <span class="error-msg">Password must be at least 8 characters</span>
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="terms" />
+          <label for="terms">I agree to the <a class="link" href="#">Terms of Service</a> and <a class="link" href="#">Privacy Policy</a></label>
+        </div>
+
+        <button class="btn-primary fade-up delay-4" id="signupBtn" style="margin-top:4px;" onclick="handleSignup()">
+          Create account
+        </button>
+
+      </div>
+
+      <p class="signin-row">Already have an account? <a class="link" href="login.html">Sign in</a></p>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const togglePwd = document.getElementById('togglePwd');
+    const pwdInput  = document.getElementById('password');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+
+    togglePwd.addEventListener('click', () => {
+      const show = pwdInput.type === 'password';
+      pwdInput.type = show ? 'text' : 'password';
+      togglePwd.style.color = show ? 'var(--purple-light)' : 'var(--text-muted)';
+    });
+
+    pwdInput.addEventListener('input', () => {
+      const v = pwdInput.value;
+      let score = 0;
+      if (v.length >= 8)  score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+
+      const configs = [
+        { w: '0%',   bg: '',                     t: '' },
+        { w: '25%',  bg: '#f87171',              t: 'Weak' },
+        { w: '50%',  bg: '#fb923c',              t: 'Fair' },
+        { w: '75%',  bg: '#facc15',              t: 'Good' },
+        { w: '100%', bg: 'var(--purple-primary)', t: 'Strong' },
+      ];
+      const c = configs[score];
+      strengthFill.style.width = c.w;
+      strengthFill.style.background = c.bg;
+      strengthText.textContent = c.t;
+    });
+
+    function showToast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + type;
+      void t.offsetWidth;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function validate() {
+      let ok = true;
+      const fields = [
+        { id: 'grp-first',  val: document.getElementById('firstName').value.trim() },
+        { id: 'grp-last',   val: document.getElementById('lastName').value.trim() },
+        { id: 'grp-password', val: document.getElementById('password').value, min: 8 },
+      ];
+
+      fields.forEach(f => {
+        const grp = document.getElementById(f.id);
+        const empty = f.min ? f.val.length < f.min : !f.val;
+        grp.classList.toggle('has-error', empty);
+        if (empty) ok = false;
+      });
+
+      const email = document.getElementById('email').value.trim();
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      document.getElementById('grp-email').classList.toggle('has-error', !emailOk);
+      if (!emailOk) ok = false;
+
+      if (!document.getElementById('terms').checked) {
+        showToast('Please accept the terms to continue.', 'error');
+        ok = false;
+      }
+
+      return ok;
+    }
+
+    async function handleSignup() {
+      if (!validate()) return;
+
+      const btn = document.getElementById('signupBtn');
+      btn.textContent = 'Creating account...';
+      btn.disabled = true;
+
+      const payload = {
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName:  document.getElementById('lastName').value.trim(),
+        email:     document.getElementById('email').value.trim(),
+        password:  document.getElementById('password').value,
+      };
+
+      try {
+        const res = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('claria_token', data.token);
+          localStorage.setItem('claria_user',  JSON.stringify(data.user));
+          showToast('Account created! Redirecting...', 'success');
+          setTimeout(() => window.location.href = 'dashboard.html', 1400);
+        } else {
+          showToast(data.message || 'Something went wrong.', 'error');
+          btn.textContent = 'Create account';
+          btn.disabled = false;
+        }
+      } catch {
+        showToast('Cannot reach the server. Try again.', 'error');
+        btn.textContent = 'Create account';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
