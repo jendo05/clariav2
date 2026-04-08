@@ -1,152 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Claria — Welcome</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
   <style>
-    body{
-      overflow: hidden;
-       overflow-x: hidden;
-       overflow-y: hidden;
-    }
-    .screen-shell { flex-direction: column; min-height: 100vh; }
+    .page { justify-content: space-between; padding-top: 20px; padding-bottom: 28px; }
 
     .top-bar {
-      width: 100%; max-width: 400px;
+      width: 100%; max-width: 420px;
       display: flex; justify-content: flex-end;
-      padding: 8px 0;
-      position: relative; z-index: 1;
-    }
-    .btn-skip {
-      font-size: 13px; color: var(--text-muted);
-      padding: 6px 12px; border-radius: 20px;
-      transition: color 0.2s;
-    }
-    .btn-skip:hover { color: var(--text-secondary); }
-
-    .illus-wrap {
-      width: 100%; max-width: 400px;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px 0 8px;
-      position: relative; z-index: 1;
-      animation: fadeUp 0.5s ease both;
-      overflow: hidden;
-      clip-path: inset(0);
+      position: relative; z-index: 1; flex-shrink: 0;
     }
 
     .illus-card {
-      width: 280px; height: 200px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
+      width: 100%; max-width: 300px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px;
+      position: relative; overflow: hidden;
     }
-
     .illus-card::after {
-      content: '';
-      position: absolute; top: 0; right: 0;
-      width: 120px; height: 120px;
-      background: radial-gradient(circle, rgba(124,92,252,0.15) 0%, transparent 70%);
+      content: ''; position: absolute; top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(124,92,252,0.18) 0%, transparent 70%);
       border-radius: 50%;
-      transform: translate(30px, -30px);
     }
-
-    .illus-label { font-size: 11px; color: var(--text-muted); font-family: var(--font-display); letter-spacing: 0.5px; text-transform: uppercase; }
-    .illus-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-top: 6px; font-family: var(--font-display); }
-
-    .tab-row { display: flex; gap: 8px; margin-top: 20px; }
+    .tab-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
     .tab {
-      padding: 8px 14px; border-radius: 8px;
-      font-size: 12px; font-weight: 500;
+      padding: 7px 12px; border-radius: 8px;
+      font-size: 12px; font-weight: 500; white-space: nowrap;
     }
-    .tab.active { background: var(--purple-primary); color: #fff; }
-    .tab.idle { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); }
-
-    .mini-row { display: flex; align-items: center; gap: 8px; margin-top: 16px; }
-    .mini-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple-primary); }
+    .tab.on  { background: var(--purple-primary); color: #fff; }
+    .tab.off { background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); }
+    .mini-row { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+    .mini-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple-primary); flex-shrink: 0; }
     .mini-bar { height: 6px; border-radius: 3px; background: var(--bg-surface); border: 1px solid var(--border); }
     .mini-badge {
       margin-left: auto; padding: 3px 8px; border-radius: 20px;
       background: rgba(124,92,252,0.15); color: var(--purple-light);
-      font-size: 10px; font-weight: 500;
+      font-size: 10px; font-weight: 500; white-space: nowrap;
     }
 
-    .copy-wrap {
-      width: 100%; max-width: 400px;
-      padding: 8px 0; position: relative; z-index: 1;
-    }
-    .copy-wrap h1 {
+    .copy h1 {
       font-family: var(--font-display);
-      font-size: 28px; font-weight: 700;
-      color: var(--text-primary);
-      line-height: 1.25;
-      animation: fadeUp 0.5s ease 0.1s both;
+      font-size: clamp(22px, 6vw, 28px); font-weight: 700;
+      color: var(--text-primary); line-height: 1.25;
     }
-    .copy-wrap h1 span { color: var(--purple-light); }
-    .copy-wrap p {
-      font-size: 15px; color: var(--text-secondary);
-      line-height: 1.65; margin-top: 12px;
-      animation: fadeUp 0.5s ease 0.2s both;
-    }
+    .copy h1 span { color: var(--purple-light); }
+    .copy p { font-size: 14px; color: var(--text-secondary); line-height: 1.65; margin-top: 10px; }
 
-    .bottom-wrap {
-      width: 100%; max-width: 400px;
-      display: flex; flex-direction: column; gap: 16px;
-      padding: 16px 0 8px;
-      position: relative; z-index: 1;
-      animation: fadeUp 0.5s ease 0.3s both;
-    }
+    .bottom { display: flex; flex-direction: column; gap: 14px; flex-shrink: 0; }
   </style>
 </head>
 <body>
+<div class="page">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <div class="screen-shell">
-    <div class="top-bar">
-      <button class="btn-skip" onclick="window.location.href='signup.html'">Skip</button>
-    </div>
+  <div class="top-bar fade-up">
+    <button class="btn-skip" onclick="location.href='signup.html'">Skip</button>
+  </div>
 
-    <div class="illus-wrap">
-      <div class="illus-card">
-        <p class="illus-label">Workspace</p>
-        <p class="illus-title">My Projects</p>
-        <div class="tab-row">
-          <div class="tab active">Tasks</div>
-          <div class="tab idle">Docs</div>
-          <div class="tab idle">Snippets</div>
-        </div>
-        <div class="mini-row">
-          <div class="mini-dot"></div>
-          <div class="mini-bar" style="width:90px;"></div>
-          <div class="mini-badge">3 open</div>
-        </div>
-        <div class="mini-row" style="margin-top:8px;">
-          <div class="mini-dot" style="background:var(--purple-dim);"></div>
-          <div class="mini-bar" style="width:60px;"></div>
-        </div>
+  <div class="illus-shell content fade-up d1">
+    <div class="illus-card">
+      <p style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--font-display)">Workspace</p>
+      <p style="font-size:15px;font-weight:600;color:var(--text-primary);margin-top:6px;font-family:var(--font-display)">My Projects</p>
+      <div class="tab-row">
+        <div class="tab on">Tasks</div>
+        <div class="tab off">Docs</div>
+        <div class="tab off">Snippets</div>
       </div>
-    </div>
-
-    <div class="copy-wrap card">
-      <h1>Your dev workspace,<br/><span>finally organized</span></h1>
-      <p>Claria brings your tasks, snippets, and notes into one focused space — designed specifically for frontend developers.</p>
-    </div>
-
-    <div class="bottom-wrap card">
-      <div class="dots">
-        <div class="dot active"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+      <div class="mini-row">
+        <div class="mini-dot"></div>
+        <div class="mini-bar" style="flex:1"></div>
+        <div class="mini-badge">3 open</div>
       </div>
-      <button class="btn-primary" onclick="window.location.href='onboarding-2.html'">Next</button>
+      <div class="mini-row">
+        <div class="mini-dot" style="background:var(--purple-dim)"></div>
+        <div class="mini-bar" style="width:60px"></div>
+      </div>
     </div>
   </div>
 
+  <div class="content copy fade-up d2" style="margin: 16px 0;">
+    <h1>Your dev workspace,<br/><span>finally organized</span></h1>
+    <p>Claria brings your tasks, snippets, and notes into one focused space — designed specifically for frontend developers.</p>
+  </div>
+
+  <div class="content bottom fade-up d3">
+    <div class="dots">
+      <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <button class="btn-primary" onclick="location.href='onboarding-2.html'">Next</button>
+  </div>
+</div>
 </body>
 </html>

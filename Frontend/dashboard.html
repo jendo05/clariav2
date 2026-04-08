@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Claria — Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="auth.js"></script>
+  <script src="diagnostic.js"></script>
+  <style>
+    /* ── Dashboard layout ─────────────────────────────── */
+    body { overflow-x: hidden; }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      grid-template-rows: 100vh;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ──────────────────────────────────────── */
+    .sidebar {
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 24px 16px;
+      position: sticky; top: 0; height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .sidebar-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; padding: 0 4px; }
+    .sidebar-logo span { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); }
+
+    .nav-section { margin-bottom: 24px; }
+    .nav-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; padding: 0 10px; margin-bottom: 6px; font-family: var(--font-display); }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 10px;
+      font-size: 14px; color: var(--text-secondary);
+      cursor: pointer; transition: all 0.2s;
+      margin-bottom: 2px; border: none; background: none;
+      width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--bg-card); color: var(--text-primary); }
+    .nav-item.active { background: rgba(124,92,252,0.15); color: var(--purple-light); }
+    .nav-item .nav-icon { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-footer { margin-top: auto; }
+    .user-chip {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .user-chip:hover { border-color: var(--purple-dim); }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(124,92,252,0.2); border: 1px solid var(--purple-dim);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: var(--purple-light);
+      flex-shrink: 0; font-family: var(--font-display);
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 500; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role { font-size: 11px; color: var(--text-muted); text-transform: capitalize; }
+
+    /* ── Main area ────────────────────────────────────── */
+    .main {
+      overflow-y: auto; overflow-x: hidden;
+      background: var(--bg-base);
+    }
+
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px 0;
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg-base);
+    }
+    .topbar-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-secondary); transition: all 0.2s;
+    }
+    .icon-btn:hover { border-color: var(--purple-dim); color: var(--text-primary); }
+
+    /* ── Page panels ──────────────────────────────────── */
+    .panel { display: none; padding: 24px 28px 40px; animation: fadeUp 0.35s ease both; }
+    .panel.active { display: block; }
+
+    /* ── Cards ────────────────────────────────────────── */
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 20px;
+    }
+    .card-sm { padding: 16px; border-radius: var(--radius-md); }
+
+    /* ── Stats row ────────────────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; }
+    .stat-val { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--text-primary); }
+    .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .stat-change { font-size: 11px; margin-top: 6px; }
+    .up { color: #34d399; } .dn { color: #f87171; }
+
+    /* ── Section heading ──────────────────────────────── */
+    .sec-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .sec-title { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--text-primary); }
+    .sec-link  { font-size: 12px; color: var(--purple-light); cursor: pointer; }
+    .sec-link:hover { color: var(--purple-primary); }
+
+    /* ── Diagnosis card ───────────────────────────────── */
+    .diag-cta {
+      background: linear-gradient(135deg, rgba(124,92,252,0.15) 0%, rgba(167,139,250,0.06) 100%);
+      border: 1px solid var(--purple-dim);
+      border-radius: var(--radius-lg); padding: 24px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .diag-cta-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 20px;
+      background: rgba(124,92,252,0.2); color: var(--purple-light);
+      font-size: 11px; font-weight: 500; width: fit-content;
+    }
+    .diag-cta h2 { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+    .diag-cta p  { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── Diagnostic quiz ──────────────────────────────── */
+    .quiz-progress-bar {
+      height: 3px; background: var(--border); border-radius: 2px;
+      overflow: hidden; margin-bottom: 28px;
+    }
+    .quiz-progress-fill { height: 100%; background: var(--purple-primary); border-radius: 2px; transition: width 0.4s ease; }
+
+    .q-section-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 500; margin-bottom: 12px;
+    }
+    .q-number { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .q-text   { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--text-primary); line-height: 1.4; margin-bottom: 20px; }
+
+    .q-options { display: flex; flex-direction: column; gap: 10px; }
+    .q-option {
+      padding: 14px 16px; border-radius: var(--radius-md);
+      background: var(--bg-surface); border: 1px solid var(--border);
+      color: var(--text-secondary); font-size: 14px; cursor: pointer;
+      transition: all 0.2s; text-align: left; width: 100%;
+      font-family: var(--font-body);
+    }
+    .q-option:hover { border-color: var(--purple-dim); color: var(--text-primary); background: rgba(124,92,252,0.08); }
+    .q-option.selected { border-color: var(--purple-primary); color: var(--purple-light); background: rgba(124,92,252,0.12); }
+
+    .q-nav { display: flex; gap: 12px; margin-top: 24px; }
+    .q-nav .btn-primary { flex: 2; }
+    .q-nav .btn-ghost   { flex: 1; width: auto; }
+
+    /* ── Results ──────────────────────────────────────── */
+    .result-hero {
+      background: linear-gradient(135deg, rgba(124,92,252,0.12) 0%, transparent 60%);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 28px; margin-bottom: 20px; text-align: center;
+    }
+    .result-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 20px; margin-bottom: 16px;
+      font-size: 12px; font-weight: 600;
+    }
+    .result-headline { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--text-primary); line-height: 1.3; margin-bottom: 12px; }
+    .result-summary  { font-size: 14px; color: var(--text-secondary); line-height: 1.7; max-width: 520px; margin: 0 auto; }
+
+    .score-bars { margin-bottom: 20px; }
+    .score-row  { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .score-name { font-size: 13px; color: var(--text-secondary); width: 110px; flex-shrink: 0; }
+    .score-track{ flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .score-bar  { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+    .score-num  { font-size: 12px; color: var(--text-muted); width: 28px; text-align: right; flex-shrink: 0; }
+
+    .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 12px; }
+    .action-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-md); padding: 16px;
+    }
+    .action-icon { font-size: 18px; margin-bottom: 10px; }
+    .action-title{ font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+    .action-body { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── Focus timer ──────────────────────────────────── */
+    .timer-wrap { display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 20px 0; }
+    .timer-ring-wrap { position: relative; width: 200px; height: 200px; }
+    .timer-bg { position: absolute; inset:0; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); }
+    .timer-svg { position: absolute; inset:0; }
+    .timer-display { position: absolute; inset:0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .timer-time { font-family: var(--font-display); font-size: 36px; font-weight: 700; color: var(--text-primary); letter-spacing: -1px; }
+    .timer-mode { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    .timer-controls { display: flex; gap: 12px; }
+    .timer-btn {
+      padding: 12px 28px; border-radius: var(--radius-md);
+      font-family: var(--font-body); font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .timer-btn.start  { background: var(--purple-primary); color: #fff; }
+    .timer-btn.start:hover { background: #6a49e8; }
+    .timer-btn.reset  { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary); }
+    .timer-btn.reset:hover { border-color: var(--purple-dim); color: var(--text-primary); }
+
+    .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .preset-btn {
+      padding: 6px 14px; border-radius: 20px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-muted); font-size: 13px; cursor: pointer;
+      transition: all 0.2s; font-family: var(--font-body);
+    }
+    .preset-btn:hover   { border-color: var(--purple-dim); color: var(--text-secondary); }
+    .preset-btn.active  { border-color: var(--purple-primary); color: var(--purple-light); background: rgba(124,92,252,0.1); }
+
+    .session-log { width: 100%; max-width: 400px; }
+    .session-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-radius: 10px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      margin-bottom: 8px; font-size: 13px;
+    }
+    .session-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--purple-primary); flex-shrink: 0; }
+
+    /* ── History ──────────────────────────────────────── */
+    .history-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px; border-radius: var(--radius-md);
+      background: var(--bg-card); border: 1px solid var(--border);
+      margin-bottom: 10px; cursor: pointer; transition: border-color 0.2s;
+    }
+    .history-item:hover { border-color: var(--purple-dim); }
+    .history-badge {
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+    }
+    .history-meta { flex: 1; }
+    .history-headline { font-size: 14px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+    .history-date { font-size: 12px; color: var(--text-muted); }
+    .history-empty { text-align: center; padding: 48px 0; color: var(--text-muted); font-size: 14px; }
+
+    /* ── Mobile nav ───────────────────────────────────── */
+    .mobile-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+    .mobile-nav-inner { display: flex; justify-content: space-around; }
+    .mob-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 4px 12px; border-radius: 10px; cursor: pointer;
+      background: none; border: none; color: var(--text-muted);
+      font-size: 10px; font-family: var(--font-body); transition: color 0.2s;
+    }
+    .mob-nav-item.active { color: var(--purple-light); }
+    .mob-nav-item .mn-icon { font-size: 18px; }
+
+    /* ── Responsive ───────────────────────────────────── */
+    @media (max-width: 700px) {
+      .app-shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; }
+      .sidebar { display: none; }
+      .main { padding-bottom: 72px; }
+      .mobile-nav { display: block; }
+      .panel { padding: 20px 16px 32px; }
+      .topbar { padding: 16px 16px 0; }
+      .action-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 701px) and (max-width: 960px) {
+      .app-shell { grid-template-columns: 64px 1fr; }
+      .sidebar { padding: 20px 10px; align-items: center; }
+      .sidebar-logo span, .nav-label, .nav-item span:last-child, .user-info { display: none; }
+      .nav-item { justify-content: center; padding: 10px; }
+      .user-chip { padding: 6px; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="#7c5cfc" stroke-width="1.4"/>
+          <path d="M6.5 10 L8.5 12 L13.5 7" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span>Claria</span>
+    </div>
+
+    <div class="nav-section">
+      <p class="nav-label">Menu</p>
+      <button class="nav-item active" onclick="navigate('home', this)">
+        <span class="nav-icon">⊞</span><span>Dashboard</span>
+      </button>
+      <button class="nav-item" onclick="navigate('diagnostic', this)">
+        <span class="nav-icon">◎</span><span>Diagnose</span>
+      </button>
+      <button class="nav-item" onclick="navigate('focus', this)">
+        <span class="nav-icon">◐</span><span>Focus Timer</span>
+      </button>
+      <button class="nav-item" onclick="navigate('history', this)">
+        <span class="nav-icon">▣</span><span>History</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-chip" onclick="Auth.logout()">
+        <div class="avatar" id="sidebarAvatar">—</div>
+        <div class="user-info">
+          <p class="user-name" id="sidebarName">—</p>
+          <p class="user-role" id="sidebarRole">—</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── Main ── -->
+  <main class="main">
+    <div class="topbar">
+      <p class="topbar-title" id="topbarTitle">Dashboard</p>
+      <div class="topbar-actions">
+        <button class="icon-btn" title="Notifications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </button>
+        <button class="icon-btn" title="Sign out" onclick="Auth.logout()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div class="panel active" id="panel-home">
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <p class="stat-val" id="statSessions">0</p>
+          <p class="stat-lbl">Focus sessions</p>
+          <p class="stat-change up" id="statSessionsChg"></p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-val" id="statMinutes">0m</p>
+          <p class="stat-lbl">Minutes focused</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-val" id="statDiagnoses">0</p>
+          <p class="stat-lbl">Diagnoses run</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-val" id="statStreak">0</p>
+          <p class="stat-lbl">Day streak</p>
+          <p class="stat-change up" id="statStreakChg"></p>
+        </div>
+      </div>
+
+      <div id="lastResultBanner" style="display:none; margin-bottom:20px;"></div>
+
+      <div class="sec-head">
+        <p class="sec-title">Productivity Diagnosis</p>
+      </div>
+      <div class="diag-cta" id="diagCta">
+        <span class="diag-cta-tag">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+          New assessment available
+        </span>
+        <h2>What's really blocking your progress?</h2>
+        <p>Answer 12 questions about how you code, think, and plan. Claria identifies your primary productivity blocker and gives you a structured action plan.</p>
+        <button class="btn-primary" style="max-width:200px;" onclick="startDiagnostic()">Start diagnosis</button>
+      </div>
+
+      <div class="sec-head" style="margin-top:28px;">
+        <p class="sec-title">Recent sessions</p>
+        <span class="sec-link" onclick="navigate('focus')">See timer →</span>
+      </div>
+      <div id="recentSessions">
+        <p style="color:var(--text-muted);font-size:14px;padding:16px 0;">No sessions yet. Start your first focus timer.</p>
+      </div>
+    </div>
+
+    <!-- DIAGNOSTIC -->
+    <div class="panel" id="panel-diagnostic">
+      <div id="diag-intro">
+        <h2 style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--text-primary);margin-bottom:10px;">Productivity Diagnosis</h2>
+        <p style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px;">12 questions across 4 dimensions: execution, skill, mental state, and direction. Takes about 3 minutes.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:28px;">
+          <div class="card card-sm"><p style="font-size:20px;margin-bottom:6px;">◎</p><p style="font-size:13px;font-weight:500;color:var(--text-primary)">Execution Pattern</p><p style="font-size:12px;color:var(--text-muted);margin-top:3px;">Consistency & habits</p></div>
+          <div class="card card-sm"><p style="font-size:20px;margin-bottom:6px;">⬡</p><p style="font-size:13px;font-weight:500;color:var(--text-primary)">Skill Depth</p><p style="font-size:12px;color:var(--text-muted);margin-top:3px;">Foundation & debugging</p></div>
+          <div class="card card-sm"><p style="font-size:20px;margin-bottom:6px;">◐</p><p style="font-size:13px;font-weight:500;color:var(--text-primary)">Mental State</p><p style="font-size:12px;color:var(--text-muted);margin-top:3px;">Burnout & comparison</p></div>
+          <div class="card card-sm"><p style="font-size:20px;margin-bottom:6px;">◈</p><p style="font-size:13px;font-weight:500;color:var(--text-primary)">Direction & Strategy</p><p style="font-size:12px;color:var(--text-muted);margin-top:3px;">Roadmap & focus</p></div>
+        </div>
+        <button class="btn-primary" style="max-width:220px;" onclick="beginQuiz()">Begin assessment</button>
+      </div>
+
+      <div id="diag-quiz" style="display:none; max-width:560px;">
+        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="qProgress" style="width:0%"></div></div>
+        <div id="qSectionTag" class="q-section-tag"></div>
+        <p class="q-number" id="qNumber"></p>
+        <p class="q-text" id="qText"></p>
+        <div class="q-options" id="qOptions"></div>
+        <div class="q-nav">
+          <button class="btn-ghost" id="qBackBtn" onclick="quizBack()" style="display:none;">Back</button>
+          <button class="btn-primary" id="qNextBtn" onclick="quizNext()" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="diag-result" style="display:none; max-width:640px;"></div>
+    </div>
+
+    <!-- FOCUS TIMER -->
+    <div class="panel" id="panel-focus">
+      <h2 style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:20px;">Focus Timer</h2>
+      <div class="timer-wrap">
+        <div class="timer-ring-wrap">
+          <div class="timer-bg"></div>
+          <svg class="timer-svg" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="88" fill="none" stroke="#2a2445" stroke-width="6"/>
+            <circle id="timerArc" cx="100" cy="100" r="88" fill="none" stroke="#7c5cfc" stroke-width="6"
+              stroke-dasharray="553" stroke-dashoffset="0"
+              stroke-linecap="round" transform="rotate(-90 100 100)"/>
+          </svg>
+          <div class="timer-display">
+            <p class="timer-time" id="timerDisplay">25:00</p>
+            <p class="timer-mode" id="timerMode">Focus</p>
+          </div>
+        </div>
+
+        <div class="timer-presets">
+          <button class="preset-btn active" onclick="setPreset(25, this)">25 min</button>
+          <button class="preset-btn" onclick="setPreset(45, this)">45 min</button>
+          <button class="preset-btn" onclick="setPreset(60, this)">60 min</button>
+          <button class="preset-btn" onclick="setPreset(90, this)">90 min</button>
+        </div>
+
+        <div class="timer-controls">
+          <button class="timer-btn reset" onclick="resetTimer()">Reset</button>
+          <button class="timer-btn start" id="timerStartBtn" onclick="toggleTimer()">Start</button>
+        </div>
+
+        <div class="session-log" id="sessionLog">
+          <p class="sec-title" style="margin-bottom:12px;">Today's sessions</p>
+          <div id="sessionItems"><p style="color:var(--text-muted);font-size:13px;">No sessions yet today.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="panel" id="panel-history">
+      <h2 style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:20px;">Diagnosis History</h2>
+      <div id="historyList"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Mobile nav -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mob-nav-item active" id="mn-home" onclick="navigate('home', null, 'mn-home')">
+      <span class="mn-icon">⊞</span><span>Home</span>
+    </button>
+    <button class="mob-nav-item" id="mn-diagnostic" onclick="navigate('diagnostic', null, 'mn-diagnostic')">
+      <span class="mn-icon">◎</span><span>Diagnose</span>
+    </button>
+    <button class="mob-nav-item" id="mn-focus" onclick="navigate('focus', null, 'mn-focus')">
+      <span class="mn-icon">◐</span><span>Focus</span>
+    </button>
+    <button class="mob-nav-item" id="mn-history" onclick="navigate('history', null, 'mn-history')">
+      <span class="mn-icon">▣</span><span>History</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+  /* ── Auth guard ── */
+  Auth.requireAuth();
+  const user = Auth.getUser();
+  if (user) {
+    const initials = ((user.firstName||'')[0]||(user.email||'')[0]||'U').toUpperCase();
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarName').textContent   = `${user.firstName} ${user.lastName}`;
+    document.getElementById('sidebarRole').textContent   = user.role;
+  }
+
+  /* ── Storage helpers ── */
+  const store = {
+    get: k => { try { return JSON.parse(localStorage.getItem('claria_'+k)); } catch { return null; } },
+    set: (k,v) => localStorage.setItem('claria_'+k, JSON.stringify(v)),
+  };
+
+  /* ── Navigation ── */
+  let currentPanel = 'home';
+  const panelTitles = { home:'Dashboard', diagnostic:'Productivity Diagnosis', focus:'Focus Timer', history:'Diagnosis History' };
+
+  function navigate(id, sidebarEl, mobileId) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-'+id).classList.add('active');
+    document.getElementById('topbarTitle').textContent = panelTitles[id];
+    currentPanel = id;
+
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (sidebarEl) sidebarEl.classList.add('active');
+
+    document.querySelectorAll('.mob-nav-item').forEach(n => n.classList.remove('active'));
+    const mId = mobileId || ('mn-'+id);
+    const mob = document.getElementById(mId);
+    if (mob) mob.classList.add('active');
+
+    if (id === 'history') renderHistory();
+    if (id === 'home') renderHome();
+    window.scrollTo(0,0);
+  }
+
+  /* ── Home ── */
+  function renderHome() {
+    const sessions = store.get('sessions') || [];
+    const diagnoses= store.get('diagnoses') || [];
+    const totalMin = sessions.reduce((a,s) => a+s.minutes, 0);
+
+    document.getElementById('statSessions').textContent = sessions.length;
+    document.getElementById('statMinutes').textContent  = totalMin > 60 ? (totalMin/60).toFixed(1)+'h' : totalMin+'m';
+    document.getElementById('statDiagnoses').textContent= diagnoses.length;
+
+    /* Streak — count consecutive days */
+    const days = [...new Set(sessions.map(s => s.date))].sort().reverse();
+    let streak = 0; const today = new Date().toDateString();
+    for (let i=0; i<days.length; i++) {
+      const d = new Date(today); d.setDate(d.getDate()-i);
+      if (days[i] === d.toDateString()) streak++; else break;
+    }
+    document.getElementById('statStreak').textContent = streak;
+
+    /* Last result banner */
+    const last = diagnoses[diagnoses.length-1];
+    const banner = document.getElementById('lastResultBanner');
+    if (last) {
+      const res = DIAGNOSTIC.results[last.category];
+      banner.style.display = 'block';
+      banner.innerHTML = `
+        <div class="card" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <span class="history-badge" style="background:${res.badge.color}22;color:${res.badge.color};">${res.badge.text}</span>
+          <div style="flex:1;min-width:160px;">
+            <p style="font-size:13px;font-weight:500;color:var(--text-primary)">${res.headline}</p>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:2px">Last assessed ${new Date(last.date).toLocaleDateString()}</p>
+          </div>
+          <button class="btn-primary" style="max-width:140px;padding:10px;" onclick="viewResult('${last.id}')">View result</button>
+        </div>`;
+    }
+
+    /* Recent sessions */
+    const recent = sessions.slice(-4).reverse();
+    const el = document.getElementById('recentSessions');
+    if (!recent.length) {
+      el.innerHTML = `<p style="color:var(--text-muted);font-size:14px;padding:16px 0;">No sessions yet. Start your first focus timer.</p>`;
+    } else {
+      el.innerHTML = recent.map(s => `
+        <div class="session-item">
+          <div class="session-dot"></div>
+          <span style="color:var(--text-secondary)">${s.minutes} min focus</span>
+          <span style="color:var(--text-muted);font-size:12px">${new Date(s.date).toLocaleDateString()}</span>
+        </div>`).join('');
+    }
+  }
+
+  /* ── Diagnostic quiz state ── */
+  let quizAnswers = {};
+  let quizFlat    = [];
+  let quizIndex   = 0;
+
+  function flattenQuestions() {
+    const flat = [];
+    DIAGNOSTIC.sections.forEach(sec => {
+      sec.questions.forEach(q => flat.push({ ...q, sectionId: sec.id, sectionLabel: sec.label, sectionIcon: sec.icon, sectionColor: sec.color }));
+    });
+    return flat;
+  }
+
+  function startDiagnostic() { navigate('diagnostic'); beginQuiz(); }
+
+  function beginQuiz() {
+    quizAnswers = {}; quizIndex = 0;
+    quizFlat = flattenQuestions();
+    document.getElementById('diag-intro').style.display  = 'none';
+    document.getElementById('diag-quiz').style.display   = 'block';
+    document.getElementById('diag-result').style.display = 'none';
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const q = quizFlat[quizIndex];
+    const total = quizFlat.length;
+    const pct   = Math.round((quizIndex / total) * 100);
+
+    document.getElementById('qProgress').style.width = pct + '%';
+    document.getElementById('qNumber').textContent   = `Question ${quizIndex+1} of ${total}`;
+    document.getElementById('qText').textContent     = q.text;
+
+    const tag = document.getElementById('qSectionTag');
+    tag.textContent = `${q.sectionIcon}  ${q.sectionLabel}`;
+    tag.style.background = q.sectionColor + '22';
+    tag.style.color      = q.sectionColor;
+
+    const opts = document.getElementById('qOptions');
+    opts.innerHTML = q.options.map((o, i) => `
+      <button class="q-option ${quizAnswers[q.id] === i ? 'selected' : ''}"
+        onclick="selectOption(${i})">${o.label}</button>
+    `).join('');
+
+    document.getElementById('qNextBtn').disabled  = !(q.id in quizAnswers);
+    document.getElementById('qNextBtn').textContent = quizIndex === total-1 ? 'See results' : 'Next';
+    document.getElementById('qBackBtn').style.display = quizIndex > 0 ? 'block' : 'none';
+  }
+
+  function selectOption(i) {
+    const q = quizFlat[quizIndex];
+    quizAnswers[q.id] = i;
+    document.querySelectorAll('.q-option').forEach((el,idx) => el.classList.toggle('selected', idx === i));
+    document.getElementById('qNextBtn').disabled = false;
+  }
+
+  function quizNext() {
+    if (quizIndex < quizFlat.length - 1) {
+      quizIndex++; renderQuestion();
+    } else {
+      computeResult();
+    }
+  }
+
+  function quizBack() {
+    if (quizIndex > 0) { quizIndex--; renderQuestion(); }
+  }
+
+  function computeResult() {
+    const scores = { consistency:0, skill:0, burnout:0, direction:0 };
+    DIAGNOSTIC.sections.forEach(sec => {
+      sec.questions.forEach(q => {
+        const idx = quizAnswers[q.id];
+        if (idx !== undefined) scores[sec.id] += q.options[idx].score;
+      });
+    });
+    const category = Object.entries(scores).reduce((a,b) => b[1]>a[1]?b:a)[0];
+
+    /* Save locally */
+    const diagnoses = store.get('diagnoses') || [];
+    const entry = { id: Date.now().toString(), date: new Date().toISOString(), scores, category };
+    diagnoses.push(entry);
+    store.set('diagnoses', diagnoses);
+
+    /* ── BACKEND CONNECT: POST /api/diagnoses ──
+       Send entry to save to user's diagnosis history in MongoDB.
+       Auth.apiFetch('http://localhost:5000/api/diagnoses', {
+         method: 'POST', body: JSON.stringify(entry)
+       });
+    ── END BACKEND CONNECT ── */
+
+    showResult(entry);
+  }
+
+  function showResult(entry) {
+    const res    = DIAGNOSTIC.results[entry.category];
+    const scores = entry.scores;
+    const maxScore = 14;
+
+    document.getElementById('diag-quiz').style.display   = 'none';
+    document.getElementById('diag-result').style.display = 'block';
+
+    const catColors = { consistency:'#7c5cfc', skill:'#34d399', burnout:'#f472b6', direction:'#fbbf24' };
+    const catLabels = { consistency:'Execution', skill:'Skill Depth', burnout:'Mental State', direction:'Direction' };
+
+    const scoreBars = Object.entries(scores).map(([k,v]) => `
+      <div class="score-row">
+        <span class="score-name">${catLabels[k]}</span>
+        <div class="score-track"><div class="score-bar" style="width:${Math.round((v/maxScore)*100)}%;background:${catColors[k]};"></div></div>
+        <span class="score-num">${v}</span>
+      </div>`).join('');
+
+    const actions = res.actions.map(a => `
+      <div class="action-card">
+        <p class="action-icon">${a.icon}</p>
+        <p class="action-title">${a.title}</p>
+        <p class="action-body">${a.body}</p>
+      </div>`).join('');
+
+    document.getElementById('diag-result').innerHTML = `
+      <div class="result-hero">
+        <div class="result-badge" style="background:${res.badge.color}22;color:${res.badge.color};">${res.badge.text}</div>
+        <p class="result-headline">${res.headline}</p>
+        <p class="result-summary">${res.summary}</p>
+      </div>
+
+      <div class="sec-head"><p class="sec-title">Score breakdown</p></div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="score-bars">${scoreBars}</div>
+      </div>
+
+      <div class="sec-head"><p class="sec-title">Your action plan</p></div>
+      <div class="action-grid" style="margin-bottom:28px;">${actions}</div>
+
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-primary" style="max-width:200px;" onclick="beginQuiz()">Retake assessment</button>
+        <button class="btn-ghost" style="max-width:160px;width:auto;" onclick="navigate('history')">View history</button>
+      </div>
+    `;
+  }
+
+  function viewResult(id) {
+    const diagnoses = store.get('diagnoses') || [];
+    const entry = diagnoses.find(d => d.id === id);
+    if (!entry) return;
+    navigate('diagnostic');
+    document.getElementById('diag-intro').style.display = 'none';
+    document.getElementById('diag-quiz').style.display  = 'none';
+    showResult(entry);
+  }
+
+  /* ── Focus timer ── */
+  let timerInterval = null;
+  let timerRunning  = false;
+  let timerTotal    = 25 * 60;
+  let timerRemaining= timerTotal;
+  const ARC_FULL    = 553;
+
+  function setPreset(minutes, el) {
+    if (timerRunning) return;
+    timerTotal = minutes * 60; timerRemaining = timerTotal;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    updateTimerDisplay();
+  }
+
+  function updateTimerDisplay() {
+    const m = Math.floor(timerRemaining / 60);
+    const s = timerRemaining % 60;
+    document.getElementById('timerDisplay').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const pct = timerRemaining / timerTotal;
+    document.getElementById('timerArc').style.strokeDashoffset = ARC_FULL * (1 - pct);
+  }
+
+  function toggleTimer() {
+    if (timerRunning) {
+      clearInterval(timerInterval); timerRunning = false;
+      document.getElementById('timerStartBtn').textContent = 'Resume';
+    } else {
+      timerRunning = true;
+      document.getElementById('timerStartBtn').textContent = 'Pause';
+      timerInterval = setInterval(() => {
+        timerRemaining--;
+        updateTimerDisplay();
+        if (timerRemaining <= 0) {
+          clearInterval(timerInterval); timerRunning = false;
+          document.getElementById('timerStartBtn').textContent = 'Start';
+          document.getElementById('timerMode').textContent = 'Done!';
+          saveSession(Math.round(timerTotal / 60));
+        }
+      }, 1000);
+    }
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval); timerRunning = false;
+    timerRemaining = timerTotal;
+    document.getElementById('timerStartBtn').textContent = 'Start';
+    document.getElementById('timerMode').textContent     = 'Focus';
+    updateTimerDisplay();
+  }
+
+  function saveSession(minutes) {
+    const sessions = store.get('sessions') || [];
+    const entry = { id: Date.now().toString(), minutes, date: new Date().toISOString() };
+    sessions.push(entry);
+    store.set('sessions', sessions);
+    renderSessionLog();
+
+    /* ── BACKEND CONNECT: POST /api/sessions ──
+       Auth.apiFetch('http://localhost:5000/api/sessions', {
+         method: 'POST', body: JSON.stringify(entry)
+       });
+    ── END BACKEND CONNECT ── */
+  }
+
+  function renderSessionLog() {
+    const sessions = store.get('sessions') || [];
+    const today = new Date().toDateString();
+    const todaySessions = sessions.filter(s => new Date(s.date).toDateString() === today).reverse();
+    const el = document.getElementById('sessionItems');
+    if (!todaySessions.length) {
+      el.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No sessions yet today.</p>`;
+    } else {
+      el.innerHTML = todaySessions.map(s => `
+        <div class="session-item">
+          <div class="session-dot"></div>
+          <span style="color:var(--text-secondary)">${s.minutes} min session</span>
+          <span style="color:var(--text-muted);font-size:12px">${new Date(s.date).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+        </div>`).join('');
+    }
+  }
+
+  /* ── History ── */
+  function renderHistory() {
+    const diagnoses = (store.get('diagnoses') || []).slice().reverse();
+    const el = document.getElementById('historyList');
+    if (!diagnoses.length) {
+      el.innerHTML = `<div class="history-empty"><p style="font-size:32px;margin-bottom:12px;">◎</p><p>No diagnoses yet.</p><p style="margin-top:6px;font-size:13px;">Run your first assessment to see results here.</p></div>`;
+      return;
+    }
+    const catColors = { consistency:'#7c5cfc', skill:'#34d399', burnout:'#f472b6', direction:'#fbbf24' };
+    el.innerHTML = diagnoses.map(d => {
+      const res = DIAGNOSTIC.results[d.category];
+      return `
+        <div class="history-item" onclick="viewResult('${d.id}')">
+          <span class="history-badge" style="background:${res.badge.color}22;color:${res.badge.color};">${res.badge.text}</span>
+          <div class="history-meta">
+            <p class="history-headline">${res.headline}</p>
+            <p class="history-date">${new Date(d.date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</p>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--text-muted);flex-shrink:0;"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>`;
+    }).join('');
+  }
+
+  /* ── Init ── */
+  renderHome();
+  renderSessionLog();
+  updateTimerDisplay();
+</script>
+</body>
+</html>

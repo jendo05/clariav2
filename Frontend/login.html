@@ -1,220 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Claria — Sign In</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
   <style>
-    .screen-shell { align-items: flex-start; justify-content: center; padding-top: 60px; }
-
-    .logo-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 32px;
-      animation: fadeUp 0.4s ease both;
-    }
-    .logo-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: var(--bg-card); border: 1px solid var(--purple-dim);
-      display: flex; align-items: center; justify-content: center;
-    }
-    .logo-name { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--text-primary); }
-
+    .page { justify-content: flex-start; overflow-y: auto; padding-top: 48px; padding-bottom: 40px; }
+    .logo-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-primary); }
     .page-heading {
       font-family: var(--font-display);
-      font-size: 26px; font-weight: 700;
+      font-size: clamp(22px,6vw,26px); font-weight: 700;
       color: var(--text-primary); line-height: 1.2;
-      animation: fadeUp 0.4s ease 0.05s both;
-    }
-    .page-sub {
-      font-size: 14px; color: var(--text-secondary);
-      margin-top: 6px; margin-bottom: 32px;
-      animation: fadeUp 0.4s ease 0.1s both;
-    }
-
-    .form-stack { display: flex; flex-direction: column; gap: 18px; }
-
-    .forgot-row {
-      display: flex; justify-content: flex-end;
-      margin-top: -10px;
     }
     .forgot-link { font-size: 12px; color: var(--text-muted); transition: color 0.2s; }
     .forgot-link:hover { color: var(--purple-light); }
-
-    .error-msg { font-size: 12px; color: #f87171; display: none; margin-top: 4px; }
-    .form-group.has-error .form-input { border-color: #f87171; }
-    .form-group.has-error .error-msg { display: block; }
-
-    .signup-row { text-align: center; font-size: 14px; color: var(--text-muted); margin-top: 20px; }
-
-    .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--bg-card); border: 1px solid var(--border);
-      padding: 12px 20px; border-radius: var(--radius-md);
-      font-size: 14px; color: var(--text-secondary);
-      opacity: 0; transition: all 0.3s; pointer-events: none;
-      white-space: nowrap; z-index: 100;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.error { border-color: #f87171; color: #f87171; }
-    .toast.success { border-color: var(--purple-dim); color: var(--purple-light); }
-
-    .role-badge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 4px 10px; border-radius: 20px;
-      background: rgba(124,92,252,0.1);
-      border: 1px solid var(--purple-dim);
-      font-size: 11px; color: var(--purple-light);
-      margin-bottom: 20px;
-      animation: fadeUp 0.4s ease 0.15s both;
-    }
-    .role-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple-primary); }
   </style>
 </head>
 <body>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
-  <div class="screen-shell">
-    <div class="card">
-
-      <div class="logo-row">
-        <div class="logo-icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="7" stroke="#7c5cfc" stroke-width="1.4"/>
-            <path d="M6.5 10 L8.5 12 L13.5 7" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <span class="logo-name">Claria</span>
-      </div>
-
-      <h1 class="page-heading">Welcome back</h1>
-      <p class="page-sub">Sign in to your workspace.</p>
-
-      <div class="form-stack fade-up delay-2">
-
-        <div class="form-group" id="grp-email">
-          <label class="form-label" for="email">Email address</label>
-          <input class="form-input" type="email" id="email" placeholder="ada@example.com" autocomplete="email" />
-          <span class="error-msg">Enter a valid email</span>
-        </div>
-
-        <div class="form-group" id="grp-password">
-          <label class="form-label" for="password">Password</label>
-          <div class="input-wrap">
-            <input class="form-input" type="password" id="password" placeholder="Your password" autocomplete="current-password" />
-            <span class="input-icon" id="togglePwd">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
-            </span>
-          </div>
-          <span class="error-msg">Password is required</span>
-        </div>
-
-        <div class="forgot-row">
-          <a class="forgot-link" href="forgot-password.html">Forgot password?</a>
-        </div>
-
-        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Sign in</button>
-
-      </div>
-
-      <p class="signup-row">Don't have an account? <a class="link" href="signup.html">Create one</a></p>
-
-    </div>
-  </div>
-
+<div class="page">
+  <div class="orb orb-1"></div><div class="orb orb-2"></div>
   <div class="toast" id="toast"></div>
 
-  <script>
-    /* ── redirect if already logged in ── */
-    if (localStorage.getItem('claria_token')) {
-      window.location.href = 'dashboard.html';
-    }
+  <div class="content" style="gap:0;">
 
-    const togglePwd = document.getElementById('togglePwd');
-    const pwdInput  = document.getElementById('password');
+    <div class="logo-row fade-up">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="#7c5cfc" stroke-width="1.4"/>
+          <path d="M6.5 10 L8.5 12 L13.5 7" stroke="#a78bfa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="logo-name">Claria</span>
+    </div>
 
-    togglePwd.addEventListener('click', () => {
-      const show = pwdInput.type === 'password';
-      pwdInput.type = show ? 'text' : 'password';
-      togglePwd.style.color = show ? 'var(--purple-light)' : 'var(--text-muted)';
-    });
+    <h1 class="page-heading fade-up d1" style="margin-top:28px;">Welcome back</h1>
+    <p class="fade-up d2" style="font-size:14px;color:var(--text-secondary);margin-top:6px;margin-bottom:28px;">Sign in to your workspace.</p>
 
-    /* ── enter key submits ── */
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    <div style="display:flex;flex-direction:column;gap:16px;" class="fade-up d2">
+      <div class="form-group" id="grp-email">
+        <label class="form-label" for="email">Email address</label>
+        <input class="form-input" type="email" id="email" placeholder="ada@example.com" autocomplete="email"/>
+        <span class="error-msg">Enter a valid email</span>
+      </div>
 
-    function showToast(msg, type = '') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast ' + type;
-      void t.offsetWidth;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
+      <div class="form-group" id="grp-pwd">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input class="form-input" type="password" id="password" placeholder="Your password" autocomplete="current-password"/>
+          <span class="input-icon" id="togglePwd">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </span>
+        </div>
+        <span class="error-msg">Password is required</span>
+      </div>
 
-    function validate() {
-      let ok = true;
-      const email = document.getElementById('email').value.trim();
-      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      document.getElementById('grp-email').classList.toggle('has-error', !emailOk);
-      if (!emailOk) ok = false;
+      <div style="display:flex;justify-content:flex-end;margin-top:-8px;">
+        <a class="forgot-link" href="forgot-password.html">Forgot password?</a>
+      </div>
 
-      const pwd = document.getElementById('password').value;
-      const pwdOk = pwd.length > 0;
-      document.getElementById('grp-password').classList.toggle('has-error', !pwdOk);
-      if (!pwdOk) ok = false;
+      <button class="btn-primary fade-up d3" id="loginBtn" onclick="handleLogin()">Sign in</button>
+    </div>
 
-      return ok;
-    }
+    <p class="fade-up d4" style="text-align:center;font-size:14px;color:var(--text-muted);margin-top:20px;">
+      Don't have an account? <a class="link" href="signup.html">Create one</a>
+    </p>
 
-    async function handleLogin() {
-      if (!validate()) return;
+  </div>
+</div>
 
-      const btn = document.getElementById('loginBtn');
-      btn.textContent = 'Signing in...';
-      btn.disabled = true;
+<script>
+  if (localStorage.getItem('claria_token')) location.href = 'dashboard.html';
 
-      const payload = {
-        email:    document.getElementById('email').value.trim(),
-        password: document.getElementById('password').value,
-      };
+  document.getElementById('togglePwd').addEventListener('click', () => {
+    const p = document.getElementById('password');
+    p.type = p.type === 'password' ? 'text' : 'password';
+  });
 
-      try {
-        const res = await fetch('http://localhost:5000/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 
-        if (res.ok) {
-          localStorage.setItem('claria_token', data.token);
-          localStorage.setItem('claria_user',  JSON.stringify(data.user));
+  function showToast(msg, type='') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast '+type;
+    void t.offsetWidth; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
 
-          showToast('Welcome back!', 'success');
+  function validate() {
+    let ok = true;
+    const email = document.getElementById('email').value.trim();
+    const eOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    document.getElementById('grp-email').classList.toggle('has-error', !eOk);
+    if (!eOk) ok = false;
+    const pOk = document.getElementById('password').value.length > 0;
+    document.getElementById('grp-pwd').classList.toggle('has-error', !pOk);
+    if (!pOk) ok = false;
+    return ok;
+  }
 
-          /* ── role-based redirect ── */
-          setTimeout(() => {
-            if (data.user.role === 'admin') {
-              window.location.href = 'admin/dashboard.html';
-            } else {
-              window.location.href = 'dashboard.html';
-            }
-          }, 1200);
-
-        } else {
-          showToast(data.message || 'Invalid credentials.', 'error');
-          btn.textContent = 'Sign in';
-          btn.disabled = false;
-        }
-      } catch {
-        showToast('Cannot reach the server. Try again.', 'error');
-        btn.textContent = 'Sign in';
-        btn.disabled = false;
+  async function handleLogin() {
+    if (!validate()) return;
+    const btn = document.getElementById('loginBtn');
+    btn.textContent = 'Signing in…'; btn.disabled = true;
+    const payload = {
+      email:    document.getElementById('email').value.trim(),
+      password: document.getElementById('password').value,
+    };
+    try {
+      /* ── BACKEND CONNECT: POST /api/auth/login ── */
+      const res  = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('claria_token', data.token);
+        localStorage.setItem('claria_user',  JSON.stringify(data.user));
+        showToast('Welcome back!', 'success');
+        setTimeout(() => {
+          /* ── Role-based redirect ── */
+          location.href = data.user.role === 'admin' ? 'admin/dashboard.html' : 'dashboard.html';
+        }, 1200);
+      } else {
+        showToast(data.message || 'Invalid credentials.', 'error');
+        btn.textContent = 'Sign in'; btn.disabled = false;
       }
+    } catch {
+      showToast('Cannot reach the server. Try again.', 'error');
+      btn.textContent = 'Sign in'; btn.disabled = false;
     }
-  </script>
+  }
+</script>
 </body>
 </html>
