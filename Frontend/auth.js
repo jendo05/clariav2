@@ -1,6 +1,12 @@
+const BASE_URL = 'https://clariav2.onrender.com';
+
 const Auth = (() => {
-  const TOKEN_KEY = 'claria_token';
-  const USER_KEY  = 'claria_user';
+const TOKEN_KEY = 'claria_token';
+const USER_KEY  = 'claria_user';
+
+const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
+const setUser  = (u) => localStorage.setItem(USER_KEY, JSON.stringify(u));
+
   const getToken  = () => localStorage.getItem(TOKEN_KEY);
   const getUser   = () => { try { return JSON.parse(localStorage.getItem(USER_KEY)); } catch { return null; } };
   const isLoggedIn= () => !!getToken();
@@ -9,7 +15,7 @@ const Auth = (() => {
 
   const apiFetch = async (url, options = {}) => {
     const token = getToken();
-    const res = await fetch(url, {
+    const res = await fetch(url.startsWith('http') ? url : BASE_URL + url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -21,5 +27,5 @@ const Auth = (() => {
     return res;
   };
 
-  return { getToken, getUser, isLoggedIn, logout, requireAuth, apiFetch };
+  return { getToken, getUser, isLoggedIn, logout, requireAuth, apiFetch, setToken, setUser };
 })();
